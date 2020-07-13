@@ -3,9 +3,6 @@ from gan import StandardGAN, RelativisticGAN, RelativisticAvgGAN
 from layerlib_stage2 import ResidualBlock, InvertedResidualBlock, SeparableResidualBlock, AtrousResidualBlock, \
     DepthwiseAtrousResidualBlock, feature_normalization, weight_normalization
 from layerlib_stage2 import DepthwiseConv2D
-from basenet import Basenet
-from rotated_basenet import RotatedBasenet
-from offset_basenet import OffsetBasenet
 from video_basenet4 import VideoBasenet
 from discriminators import discriminators
 from vgg import VGG16Loss
@@ -13,9 +10,6 @@ import numpy as np
 import tensorflow_addons as tfa
 
 model_factory = {
-    "basenet": Basenet,
-    "rotated_basenet": RotatedBasenet,
-    "offset_basenet": OffsetBasenet,
     "video_basenet": VideoBasenet,
 }
 
@@ -58,7 +52,6 @@ class DeblurModel(object):
 
         self.learning_rate = 0.001
         self.step = tf.Variable(1, trainable=False, dtype=tf.int64)
-        # self.learning_rate = lambda step: exponential_decay(0.0001, decay_rate=0.5, step=step, decay_steps=2)
         self.optimizer_g = tf.optimizers.Adam(learning_rate=self.learning_rate)
 
         if self.use_gan:
@@ -88,18 +81,6 @@ class DeblurModel(object):
 
         if self.use_vgg:
             self.vgg = VGG16Loss()
-
-        '''self.laplace_filter = np.array([[1, 3, 4, 4, 4, 3, 1],
-                                        [3, 4, 3, 0, 3, 4, 3],
-                                        [4, 3, -9, -17, -9, 3, 4],
-                                        [4, 0, -17, -30, -17, 0, 4],
-                                        [4, 3, -9, -17, -9, 3, 4],
-                                        [3, 4, 3, 0, 3, 4, 3],
-                                        [1, 3, 4, 4, 4, 3, 1]]) / 255.0
-        self.laplace_filter = np.stack([self.laplace_filter, self.laplace_filter, self.laplace_filter], axis=-1)
-        self.laplace_filter = tf.constant(np.expand_dims(self.laplace_filter, axis=-1), dtype=tf.float32)
-        self.laplace = DepthwiseConv2D(kernel_size=7, use_bias=False, use_scale=False, act=None,
-                                       convolution_kernel=self.laplace_filter)'''
 
     def checkpoint(self):
         if self.use_gan:
