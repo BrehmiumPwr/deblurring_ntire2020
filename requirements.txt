@@ -7,4 +7,4 @@ scikit_image==0.16.2
 opencv_python==4.1.2.30
 absl==0.0
 skimage==0.0
-tensorflow==2.1.0
+tensorflow==2.9.3
